@@ -21,7 +21,7 @@ import json
 import argparse
 
 #https://discuss.pytorch.org/t/cuda-freezes-the-python/9651/5
-torch.randn(10).cuda()
+#torch.randn(10).cuda() #removed, working on CPU
 
 ############
 # need the following to avoid the following error:

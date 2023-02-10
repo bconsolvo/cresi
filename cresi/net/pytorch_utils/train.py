@@ -58,7 +58,7 @@ class Estimator:
     """
     
     def __init__(self, model: torch.nn.Module, optimizer: Type[optim.Optimizer], save_path, config):
-        self.model = nn.DataParallel(model).cuda()
+        self.model = nn.DataParallel(model) #.cuda() only for GPU
         self.optimizer = optimizer(self.model.parameters(), lr=config.lr)
         self.start_epoch = 0
         os.makedirs(save_path, exist_ok=True)
@@ -191,8 +191,8 @@ class Estimator:
 
         meter = defaultdict(float)
         for input, target in zip(inputs, targets):
-            input = torch.autograd.Variable(input.cuda(async=True), volatile=not training)
-            target = torch.autograd.Variable(target.cuda(async=True), volatile=not training)
+            #input = torch.autograd.Variable(input.cuda(async=True), volatile=not training) #not needed in latest version of pytorch
+            #target = torch.autograd.Variable(target.cuda(async=True), volatile=not training) #not needed in latest version of pytorch
             if verbose:
                 print("input.shape, target.shape:", input.shape, target.shape)
             output = self.model(input)
