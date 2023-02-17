@@ -17,7 +17,6 @@ torchsummary
 geopandas==0.6.3
 tensorboardX
 tensorboard
-pytorch_zoo
 networkx==2.2
 numba
 utm

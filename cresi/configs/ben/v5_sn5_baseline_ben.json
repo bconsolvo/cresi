@@ -15,8 +15,8 @@
     "early_stopper_patience": 8,
     "nb_epoch": 30,
 
-    "test_data_refined_dir": "/home/devcloud/spacenet5data/mumbai/data/PS-MS",
-    "test_results_dir": "sn5_baseline_mumbai",    
+    "test_data_refined_dir": "/home/devcloud/spacenet5data/moscow/data/PS-MS",
+    "test_results_dir": "sn5_baseline",    
     "folds_save_dir": "folds",
     "tile_df_csv": "tile_df.csv",  
     "test_sliced_dir": "",
