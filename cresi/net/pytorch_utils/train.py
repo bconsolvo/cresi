@@ -13,6 +13,7 @@ from torch.autograd import Variable
 from torch.utils.data.dataloader import DataLoader as PytorchDataLoader
 from tqdm import tqdm
 from typing import Type
+import intel_extension_for_pytorch as ipex
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -60,6 +61,10 @@ class Estimator:
     def __init__(self, model: torch.nn.Module, optimizer: Type[optim.Optimizer], save_path, config):
         self.model = nn.DataParallel(model) #.cuda() only for GPU
         self.optimizer = optimizer(self.model.parameters(), lr=config.lr)
+        
+        # add line for IPEX optimization and bfloat16 for mixed training
+        self.model, self.optimizer = ipex.optimize(self.model, optimizer=self.optimizer,dtype=torch.bfloat16)
+        
         self.start_epoch = 0
         os.makedirs(save_path, exist_ok=True)
         self.save_path = save_path
@@ -100,6 +105,7 @@ class Estimator:
 
     def calculate_loss_single_channel(self, output, target, meter, training, 
                                       iter_size, weight_channel=None):
+        
         # apply weights and reshapes if needed
         if weight_channel:
             output, target = weight_reshape(output, target,
@@ -110,7 +116,7 @@ class Estimator:
         if 'ce' in self.config.loss.keys():
             pass
         else:
-            output = F.sigmoid(output)
+            output = torch.sigmoid(output)
         
         #ce = F.cross_entropy(output, target)
         #ce = F.cross_entropy(output.long(), target)
@@ -193,13 +199,16 @@ class Estimator:
         for input, target in zip(inputs, targets):
             #input = torch.autograd.Variable(input.cuda(async=True), volatile=not training) #not needed in latest version of pytorch
             #target = torch.autograd.Variable(target.cuda(async=True), volatile=not training) #not needed in latest version of pytorch
-            if verbose:
-                print("input.shape, target.shape:", input.shape, target.shape)
-            output = self.model(input)
-            meter = self.calculate_loss_single_channel(output, target, meter, training, iter_size)
+            
+            # add line for auto mixed precision:
+            with torch.cpu.amp.autocast():
+                if verbose:
+                    print("input.shape, target.shape:", input.shape, target.shape)
+                output = self.model(input)
+                meter = self.calculate_loss_single_channel(output, target, meter, training, iter_size)
 
         if training:
-            torch.nn.utils.clip_grad_norm(self.model.parameters(), 1.)
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.)
             self.optimizer.step()
         return meter, None#torch.cat(outputs, dim=0)
 
@@ -288,7 +297,7 @@ class PytorchTrain:
             self.callbacks.on_epoch_begin(epoch)
 
             if self.estimator.lr_scheduler is not None:
-                self.estimator.lr_scheduler.step(epoch)
+                self.estimator.lr_scheduler.step()
 
             self.estimator.model.train()
             # print("pytorch_utils.train.py.fit() checkpoint0")

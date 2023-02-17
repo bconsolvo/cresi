@@ -46,10 +46,10 @@ def dice_round(preds, trues, is_average=True):
 
 def dice(preds, trues, weight=None, is_average=True):
     num = preds.size(0)
-    preds = preds.view(num, -1)
-    trues = trues.view(num, -1)
+    preds = preds.reshape(num, -1)
+    trues = trues.reshape(num, -1)
     if weight is not None:
-        w = torch.autograd.Variable(weight).view(num, -1)
+        w = torch.autograd.Variable(weight).reshape(num, -1)
         preds = preds * w
         trues = trues * w
     intersection = (preds * trues).sum(1)
@@ -86,8 +86,8 @@ def soft_dice_loss(outputs, targets, per_image=False):
     eps = 1e-5
     if not per_image:
         batch_size = 1
-    dice_target = targets.contiguous().view(batch_size, -1).float()
-    dice_output = outputs.contiguous().view(batch_size, -1)
+    dice_target = targets.contiguous().reshape(batch_size, -1).float()
+    dice_output = outputs.contiguous().reshape(batch_size, -1)
     intersection = torch.sum(dice_output * dice_target, dim=1)
     union = torch.sum(dice_output, dim=1) + torch.sum(dice_target, dim=1) + eps
     loss = (1 - (2 * intersection + eps) / union).mean()
@@ -138,9 +138,9 @@ def focal(outputs, targets, gamma=2,  ignore_index=255):
     outputs = outputs.contiguous()
     targets = targets.contiguous()
     eps = 1e-8
-    non_ignored = targets.view(-1) != ignore_index
-    targets = targets.view(-1)[non_ignored].float()
-    outputs = outputs.contiguous().view(-1)[non_ignored]
+    non_ignored = targets.reshape(-1) != ignore_index
+    targets = targets.reshape(-1)[non_ignored].float()
+    outputs = outputs.contiguous().reshape(-1)[non_ignored]
     outputs = torch.clamp(outputs, eps, 1. - eps)
     targets = torch.clamp(targets, eps, 1. - eps)
     pt = (1 - targets) * (1 - outputs) + targets * outputs
