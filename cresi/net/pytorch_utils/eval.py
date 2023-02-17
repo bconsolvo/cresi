@@ -21,6 +21,8 @@ from torch.utils.data.dataloader import DataLoader as PytorchDataLoader
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from dataset.neural_dataset import SequentialDataset
 
+import intel_extension_for_pytorch as ipex
+
 # global variables for cpu_func()
 MOD = 0
 FLIPS = 0
@@ -66,7 +68,7 @@ def predict(model, batch, flips=flip.FLIP_NONE, verbose=False):
 
     #print ("run eval.predict()...")
     # predict with tta on gpu
-    pred1 = F.sigmoid(model(batch))
+    pred1 = torch.sigmoid(model(batch))
     # with torch.no_grad():
     #    pred1 = F.sigmoid(model(batch))
 
@@ -109,12 +111,14 @@ def read_model(path_model_weights, fold, n_gpus=4):
             print("load model with cpu")
             # torch 0.3
             model = torch.load(os.path.join(path_model_weights, 'fold{}_best.pth'.format(fold)),  map_location=lambda storage, loc: storage)
+            
             #model = torch.load(os.path.join(path_model_weights, 'fold{}_best.pth'.format(fold)),  map_location=lambda storage, location: 'cpu')
             ## torch 0.4
             #model = torch.load(os.path.join(path_model_weights, 'fold{}_best.pth'.format(fold)), map_location='cpu')
     
         #model = torch.load(os.path.join(config.results_dir, 'weights', config.folder, 'fold{}_best.pth'.format(fold)))
         model.eval()
+        model = ipex.optimize(model,dtype=torch.bfloat16)
         print ("  model:", model)
         print ("  model sucessfully loaded")
         return model
@@ -198,7 +202,12 @@ class Evaluator:
         else:
             for data in pbar:
                 samples = torch.autograd.Variable(data['image'], volatile=True)
-                predicted = predict(model, samples, flips=self.flips)
+                
+                with torch.no_grad():
+                    with torch.cpu.amp.autocast():
+                #        model = torch.jit.trace(model,samples)
+                #        model = torch.jit.freeze(model)
+                        predicted = predict(model, samples, flips=self.flips)
                 if verbose:
                     print("  eval.py -  - Evaluator - predict() - len samples:", len(samples))
                     print("  eval.py - Evaluator - predict()- samples.shape:", samples.shape)
