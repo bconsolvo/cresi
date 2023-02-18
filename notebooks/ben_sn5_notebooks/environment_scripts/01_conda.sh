@@ -7,14 +7,14 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-py38_23.1.0-1-Linux-x86_64.s
     /opt/conda/bin/conda clean -tip && \
     sudo ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
     echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
-
+source ~/.bashrc
 #Create new conda environment
 conda create --name py39 python=3.9
 echo "conda activate py39" >> ~/.bashrc
 source ~/.bashrc
 
 conda install -c conda-forge libgdal
-conda install -c conda-forge gdal
+conda install -c conda-forge gdal=3.0.4
 conda install tiledb=2.2
 conda install poppler
 conda install intel-openmp

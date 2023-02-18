@@ -1,7 +1,7 @@
 # train
 
 #set env vars
-#export OMP_NUM_THREADS=24
+export OMP_NUM_THREADS=24
 #export NUM_PROCESSES=8
 #export NUM_PROCESSES_PER_NODE=2
 #export CCL_WORKER_COUNT=2
