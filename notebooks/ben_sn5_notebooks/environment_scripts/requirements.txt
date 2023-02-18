@@ -17,7 +17,7 @@ torchsummary
 geopandas==0.6.3
 tensorboardX
 tensorboard
-networkx==2.2
+networkx==2.8
 numba
 utm
 intel_extension_for_pytorch

@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #pip upgrades
-python -m pip install --upgrade pip setuptools wheel
-python -m pip install --upgrade gdal
-#pip3 install setuptools==57.5.0 #for 3rd gen xeon
+python -m pip install --upgrade pip wheel
+#python -m pip install --upgrade gdal
+pip3 install setuptools #==57.5.0 #for 3rd gen xeon
 #python -m pip install --upgrade gdal==3.0.4 #for 3rd gen xeon
 
 #install torch for CPU
