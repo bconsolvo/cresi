@@ -61,7 +61,8 @@ def train_cresi(config, paths, fn_mapping, image_suffix, folds_file_loc,
         print("save_path:", save_path)
 
     folds = get_csv_folds(folds_file_loc, ds.im_names)
-    num_workers = 0 if os.name == 'nt' else 2
+    num_workers = 0
+    #num_workers = 0 if os.name == 'nt' else 2
     for fold, (train_idx, val_idx) in enumerate(folds):
         if args.fold is not None and int(args.fold) != fold:
             continue

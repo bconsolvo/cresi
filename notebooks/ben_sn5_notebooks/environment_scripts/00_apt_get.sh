@@ -24,4 +24,6 @@ sudo apt-get install -y \
     libgl1 \
     ffmpeg \
     libsm6 \
-    libxext6
+    libxext6 \
+    google-perftools \
+    numactl
