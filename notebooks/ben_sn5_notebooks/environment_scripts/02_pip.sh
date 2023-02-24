@@ -2,7 +2,7 @@
 
 #pip upgrades
 python -m pip install --upgrade pip wheel
-pip3 install setuptools #==57.5.0 #for 3rd gen xeon
+pip3 install setuptools==57.5.0 #for 3rd gen xeon
 
 #install torch for CPU
 pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu

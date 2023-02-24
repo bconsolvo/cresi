@@ -19,3 +19,4 @@ networkx==2.8
 numba
 utm
 intel_extension_for_pytorch
+gdal==3.0.4

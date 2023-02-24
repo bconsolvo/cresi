@@ -25,5 +25,4 @@ sudo apt-get install -y \
     ffmpeg \
     libsm6 \
     libxext6 \
-    google-perftools \
     numactl
