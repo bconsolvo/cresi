@@ -117,7 +117,7 @@ def speed_mask_dir(geojson_dir, image_dir, output_dir,
 
         # Get geojson path
         
-        if label_type == 'SN3' or label_type == 'SN5': 
+        if label_type == 'SN5':
             # SpaceNet chips
             geojson_path = os.path.join(
                 geojson_dir, image_root.replace('PS-RGB', 'geojson_roads_speed').replace('PS-MS', 'geojson_roads_speed')
@@ -125,6 +125,10 @@ def speed_mask_dir(geojson_dir, image_dir, output_dir,
                 + '.geojson')
             # # Contiguous files
             # geojson_path = os.path.join(geojson_dir, image_root + '.geojson')
+        elif label_type == 'SN3': 
+            geojson_path = os.path.join(
+                geojson_dir, image_root.replace('PS-RGB', 'geojson_roads').replace('PS-MS', 'geojson_roads')
+                + '.geojson')
         elif label_type == 'SN4':
             # example im: Pan-Sharpen_Atlanta_nadir7_catid_1030010003D22F00_748451_3743589.tif
             # example json: spacenet-roads_748451_3743589_speed.geojson
