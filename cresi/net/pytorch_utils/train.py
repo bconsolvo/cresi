@@ -13,7 +13,7 @@ from torch.autograd import Variable
 from torch.utils.data.dataloader import DataLoader as PytorchDataLoader
 from tqdm import tqdm
 from typing import Type
-import intel_extension_for_pytorch as ipex
+#import intel_extension_for_pytorch as ipex
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -63,8 +63,11 @@ class Estimator:
         self.optimizer = optimizer(self.model.parameters(), lr=config.lr)
         
         # add line for IPEX optimization and bfloat16 for mixed training
-        self.model, self.optimizer = ipex.optimize(self.model, optimizer=self.optimizer,dtype=torch.bfloat16)
+        #self.model, self.optimizer = ipex.optimize(self.model, optimizer=self.optimizer,dtype=torch.bfloat16)
         
+        #pytorch 2.0
+        self.model = torch.compile(self.model,mode='max-autotune')
+
         self.start_epoch = 0
         os.makedirs(save_path, exist_ok=True)
         self.save_path = save_path
@@ -201,11 +204,12 @@ class Estimator:
             #target = torch.autograd.Variable(target.cuda(async=True), volatile=not training) #not needed in latest version of pytorch
             
             # add line for auto mixed precision:
-            with torch.cpu.amp.autocast():
-                if verbose:
-                    print("input.shape, target.shape:", input.shape, target.shape)
-                output = self.model(input)
-                meter = self.calculate_loss_single_channel(output, target, meter, training, iter_size)
+            #with torch.cpu.amp.autocast():
+            #    if verbose:
+            #        print("input.shape, target.shape:", input.shape, target.shape)
+            #with torch.autocast(device_type='cpu',dtype=torch.bfloat16):
+            output = self.model(input)
+            meter = self.calculate_loss_single_channel(output, target, meter, training, iter_size)
 
         if training:
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.)
