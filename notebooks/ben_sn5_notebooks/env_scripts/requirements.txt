@@ -18,5 +18,5 @@ tensorboard
 networkx==2.8
 numba
 utm
-intel_extension_for_pytorch
+intel_extension_for_pytorch==1.13
 gdal==3.0.4
